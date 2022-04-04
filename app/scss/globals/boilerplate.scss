@@ -17,3 +17,17 @@ body {
   margin: 0;
   font-size: 1rem;
 }
+
+main {
+  display: grid;
+  gap: rem(26);
+
+  @include breakpoint-up(medium) {
+    place-items: center;
+  }
+
+  @include breakpoint-up(large) {
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: rem(130);
+  }
+}

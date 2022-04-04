@@ -1,0 +1,49 @@
+@use '../util' as *;
+
+.gallery {
+  display: none;
+  width: rem(445);
+
+  @include breakpoint-up(medium) {
+    display: block;
+  }
+
+  &__poster {
+    margin-bottom: rem(30);
+
+    &--hide {
+      display: none;
+      width: rem(445);
+      height: rem(442);
+      border-radius: rem(10);
+      cursor: pointer;
+    }
+
+    &--show {
+      display: block;
+    }
+  }
+
+  &__thumbnail {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+
+    &--img {
+      width: rem(91);
+      height: rem(94);
+      border-radius: rem(10);
+      transition: opacity 300ms ease-in;
+      cursor: pointer;
+
+      &:hover{
+        opacity: .5;
+      }
+    }
+
+    &--selected {
+      opacity: .5;
+      border: rem(2) solid var(--orange);
+    }
+  }
+}
