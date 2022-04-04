@@ -13,6 +13,7 @@ html {
 }
 
 body {
+  height: 100vh; // Temp
   padding: 0;
   margin: 0;
   font-size: 1rem;
@@ -30,4 +31,59 @@ main {
     grid-template-columns: repeat(2, 1fr);
     margin-bottom: rem(130);
   }
+}
+
+.menu-modal {
+  width: rem(250);
+  max-height: 100vh;
+  height: 100%;
+  margin: 0;
+  border: none;
+  padding-block: rem(25);
+  padding-inline: rem(25);
+
+  &__close {
+    width: rem(18);
+    height: rem(18);
+    margin-bottom: rem(55);
+    border: none;
+    background-color: var(--white);
+    background-image: url('/images/icon-close.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 100% 100%;
+    cursor: pointer;
+  }
+
+  &__links {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    
+    > *:not(:last-child) {
+      margin-bottom: rem(33);
+    }
+  
+    li {
+  
+      a {
+        font-size: rem(15);
+        font-weight: 700;
+        color: var(--black);
+      }
+    }
+  }
+
+  &::backdrop {
+    background-color: hsla(0, 0%, 0%, 75%);
+  }
+}
+
+.gallery-modal {
+  
+}
+
+.fixed-position {
+  position: fixed;
+  padding-left: rem(15);
 }

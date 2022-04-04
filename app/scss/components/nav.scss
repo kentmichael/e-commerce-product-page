@@ -152,6 +152,113 @@
   }
   
   &__dialog {
+    width: 96%;
+    //height: rem(257);
+    position: absolute;
+    top: 107%;
+    border: none;
+    border-radius: rem(10);
+    padding-inline: 0;
+    padding-block: 0;
+    background-color: var(--white);
+    z-index: 1;
 
+    &--header {
+      border-bottom: rem(1) solid var(--gray-blue);
+      padding-block: rem(26);
+      padding-inline: rem(25);
+      font-size: rem(16);
+      font-weight: 700;
+      color: var(--very-dk-blue);
+    }
+
+    &--empty {
+      height: rem(185);
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      padding-block: rem(24);
+      padding-inline: rem(25);
+      font-size: rem(14);
+      font-weight: 700;
+      color: var(--dk-gray-blue);
+    }
+
+    &--content {
+      padding-top: rem(24);
+      padding-bottom: rem(30);
+      padding-inline: rem(24);
+
+      div {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        gap: rem(16);
+        margin-bottom: rem(27);
+
+        img {
+          width: rem(50);
+          height: rem(50);
+          border-radius: rem(5);
+        }
+
+        div {
+          height: min-content;
+          width: rem(213);
+          flex-grow: 1;
+          display: flex;
+          flex-flow: column nowrap;
+          align-items: flex-start;
+          gap: rem(10);
+          margin-bottom: 0;
+          color: var(--dk-gray-blue);
+
+          p {
+            margin: 0;
+            width: rem(190);
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+        }
+
+        button {
+          width: rem(16);
+          height: rem(18);
+          border: none;
+          border-radius: 0;
+          padding: 0;
+          background-color: var(--white);
+          background-image: url('/images/icon-delete.svg');
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-size: 100% 100%;
+        }
+      }
+
+      button {
+        width: 100%;
+        border: none;
+        border-radius: rem(10);
+        padding-block: rem(20);
+        background-color: var(--orange);
+        font-size: rem(15);
+        font-weight: 700;
+        color: var(--white);
+        cursor: pointer;
+      }
+    }
+
+    @include breakpoint-up(medium) {
+      top: 93%;
+      max-width: rem(360);
+      margin: 0;
+      margin-left: auto;
+    }
   }
+}
+
+.total {
+  font-weight: 700;
+  color: var(--very-dk-blue);
 }

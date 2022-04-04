@@ -29,7 +29,7 @@
     color: var(--very-dk-blue);
 
     @include breakpoint-up(large) {
-      margin-bottom: rem(50);
+      margin-bottom: rem(44);
       font-size: rem(34);
     }
   }

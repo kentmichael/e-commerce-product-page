@@ -161,16 +161,18 @@ class Product {
         product.images.forEach((posters, idx) => {
           const galleryPosterImg = document.createElement('img');
           const galleryThumbnailImg = document.createElement('img');
+          const galleryThumbnailDiv = document.createElement('div');
           galleryPosterImg.classList.add('gallery__poster--hide');
           galleryPosterImg.src = posters.poster;
           galleryPoster.appendChild(galleryPosterImg);
           galleryThumbnailImg.src = posters.thumbnail;
           galleryThumbnailImg.classList.add('gallery__thumbnail--img');
-          galleryThumbnailImg.addEventListener('click', () => {
+          galleryThumbnailDiv.addEventListener('click', () => {
             this.showPoster(idx);
             this.selectedThumbnail(idx);
           });
-          galleryThumbnail.appendChild(galleryThumbnailImg);
+          galleryThumbnailDiv.appendChild(galleryThumbnailImg)
+          galleryThumbnail.appendChild(galleryThumbnailDiv);
         })
       }
     });
@@ -193,12 +195,19 @@ class Product {
   }
 
   selectedThumbnail = (idx=0) => {
-    const galleryThumbnail = document.querySelector('.gallery__thumbnail');
-    galleryThumbnail.childNodes.forEach((element) => {
+    const galleryThumbnail = document.querySelectorAll('.gallery__thumbnail--img');
+    const galleryThumbnailDiv = document.querySelector('.gallery__thumbnail');
+
+    galleryThumbnailDiv.childNodes.forEach((element) => {
+      element.classList.remove('gallery__thumbnail--border');
+    });
+
+    galleryThumbnail.forEach((element) => {
       element.classList.remove('gallery__thumbnail--selected');
     });
 
-    galleryThumbnail.childNodes[idx].classList.add('gallery__thumbnail--selected');
+    galleryThumbnail[idx].classList.add('gallery__thumbnail--selected');
+    galleryThumbnailDiv.childNodes[idx].classList.add('gallery__thumbnail--border');
   }
 
 }
@@ -214,7 +223,7 @@ inventoryProduct.displayProductInGallery(productId);
   User class
 */
 class User {
-  constructor(inventoryProduct, productId, addToMyCart, showMyCart, setQuantityPlus, setQuantityMinus) {
+  constructor(inventoryProduct, productId, addToMyCart, showMyCart, cartDialog, setQuantityPlus, setQuantityMinus) {
     this.user = {
       name: 'User 1',
       cart: []
@@ -226,6 +235,7 @@ class User {
     this.minusQuantity = setQuantityMinus;
     this.quantityCount = 0;
     this.showCart = showMyCart;
+    this.cartDialogModal = cartDialog;
 
     this.addToCart.addEventListener('click', this.addProductToCart);
     this.addQuantity.addEventListener('click', this.addProductQuantity);
@@ -249,9 +259,10 @@ class User {
       }else{
         products.forEach((product) => {
           if(product.id === prodId){
+            let name = product.name;
             this.user.cart.push({
               id: product.id,
-              name: product.name,
+              name: name.replace('Fall', 'Autumn'),
               price: product.price,
               discount: product.discount,
               quantity: quantityCount,
@@ -262,6 +273,10 @@ class User {
       }
       this.setQuantity(true);
       this.quantityCount = 0;
+    }
+
+    if(document.querySelector('.mainContent')!==null || document.querySelector('.nav__dialog--empty')!==null){
+      this.updateCartModal();
     }
   }
 
@@ -296,11 +311,113 @@ class User {
   }
 
   showCartModal = () => {
-    const nav = document.querySelector('.nav');
-    const cartDialog = document.createElement('dialog');
+    const {user} = this;
 
+    if(document.querySelector('.nav__dialog')==null){
+      const nav = document.querySelector('.nav');
+      const cartDialog = document.createElement('dialog');
+      const cartDialogHeader = document.createElement('header');
+      const cartDialogContent = document.createElement('div');
+      cartDialog.classList.add('nav__dialog');
+      cartDialogHeader.classList.add('nav__dialog--header');
+      cartDialogHeader.innerText = 'Cart';
+      
 
-    nav.appendChild(cartDialog);
+      if(user.cart.length===0){
+        cartDialogContent.classList.add('nav__dialog--empty');
+        cartDialogContent.innerText = 'Your cart is empty.';
+      }else {
+        cartDialogContent.classList.add('nav__dialog--content');
+        const cartDialogContentDiv = document.createElement('div');
+        const cartDialogCheckout = document.createElement('button');
+        cartDialogContentDiv.classList.add('mainContent');
+        
+        user.cart.forEach((item) => {
+          const cartDialogContentIcon = document.createElement('img');
+          const cartDialogContentDiv2 = document.createElement('div');
+          const cartDialogContentDiv2Name = document.createElement('p');
+          const cartDialogContentDiv2Total = document.createElement('p');
+          const cardDialogContentDelete = document.createElement('button');
+          cardDialogContentDelete.addEventListener('click', () => {
+            this.deleteCartContent(item.id);
+          });
+
+          cartDialogContentIcon.src = item.image;
+          cartDialogContentDiv2Name.innerText = item.name;
+          let total = (item.price - (item.price * (item.discount/100))) * item.quantity;
+          cartDialogContentDiv2Total.innerHTML = `$${(item.price * (item.discount/100)).toFixed(2)} x ${item.quantity} <span class="total">$${total.toFixed(2)}</span>`;
+
+          cartDialogContentDiv2.append(cartDialogContentDiv2Name, cartDialogContentDiv2Total);
+          cartDialogContentDiv.append(cartDialogContentIcon, cartDialogContentDiv2, cardDialogContentDelete);
+        });
+        
+        cartDialogCheckout.innerText = 'Checkout';
+        cartDialogContent.append(cartDialogContentDiv, cartDialogCheckout);
+      }
+
+      cartDialog.append(cartDialogHeader, cartDialogContent);
+      nav.appendChild(cartDialog);
+      cartDialog.show();
+    }else{
+      this.closeCartModal();
+    }
+  }
+
+  deleteCartContent = (id) => {
+    const cartDialogContent = document.querySelector('.nav__dialog--content');
+    cartDialogContent.innerHTML = '';
+    cartDialogContent.classList = 'nav__dialog--empty';
+    cartDialogContent.innerText = 'Your cart is empty.';
+    let index = 0;
+    this.user.cart.forEach((item, idx) => {
+      if(item.id === id) index = idx;
+    });
+    this.user.cart.splice(index, 1);
+  } 
+
+  updateCartModal = () => {
+    const {user} = this;
+
+    if(document.querySelector('.mainContent')===null){
+      const dialogContentEmpty = document.querySelector('.nav__dialog--empty');
+      const mainContent = document.createElement('div');
+      const cartDialogCheckout = document.createElement('button');
+
+      dialogContentEmpty.classList = 'nav__dialog--content';
+      dialogContentEmpty.innerText = '';
+      mainContent.classList.add('mainContent');
+      dialogContentEmpty.appendChild(mainContent);
+      cartDialogCheckout.innerText = 'Checkout';
+      dialogContentEmpty.appendChild(cartDialogCheckout);
+    }
+    
+    const dialogContent = document.querySelector('.mainContent');
+    dialogContent.innerHTML = '';
+
+    user.cart.forEach((item) => {
+      const cartDialogContentIcon = document.createElement('img');
+      const cartDialogContentDiv2 = document.createElement('div');
+      const cartDialogContentDiv2Name = document.createElement('p');
+      const cartDialogContentDiv2Total = document.createElement('p');
+      const cardDialogContentDelete = document.createElement('button');
+      cardDialogContentDelete.addEventListener('click', () => {
+        this.deleteCartContent(item.id);
+      });
+
+      cartDialogContentIcon.src = item.image;
+      cartDialogContentDiv2Name.innerText = item.name;
+      let total = (item.price - (item.price * (item.discount/100))) * item.quantity;
+      cartDialogContentDiv2Total.innerHTML = `$${(item.price * (item.discount/100)).toFixed(2)} x ${item.quantity} <span class="total">$${total.toFixed(2)}</span>`;
+
+      cartDialogContentDiv2.append(cartDialogContentDiv2Name, cartDialogContentDiv2Total);
+      dialogContent.append(cartDialogContentIcon, cartDialogContentDiv2, cardDialogContentDelete);
+    });
+  }
+
+  closeCartModal = () => {
+    const cartModal = document.querySelector('.nav__dialog');
+    cartModal.remove();
+    cartModal.close();
   }
 }
 
@@ -308,5 +425,57 @@ const showMyCart = document.querySelector('.nav__cart');
 const addToMyCart = document.querySelector('.product__add--tocart');
 const setQuantityPlus = document.querySelector('.product__add--plus');
 const setQuantityMinus = document.querySelector('.product__add--minus');
+const cartDialog = document.querySelector('.nav__dialog');
 
-const customer = new User(inventoryProduct, productId, addToMyCart, showMyCart, setQuantityPlus, setQuantityMinus);
+const customer = new User(inventoryProduct, productId, addToMyCart, showMyCart, cartDialog, setQuantityPlus, setQuantityMinus);
+
+// Modals
+
+class Modal {
+  constructor(menuButton) {
+    this.menuButtonModal = menuButton;
+
+    this.menuButtonModal.addEventListener('click', this.showMenuModal);
+  }
+
+  showMenuModal = () => {
+    this.menuModal = document.createElement('dialog');
+    this.menuModal.classList.add('menu-modal');
+    document.body.appendChild(this.menuModal);
+    document.body.classList.add('fixed-position');
+    this.createMenuModalContent();
+    this.menuModal.showModal();
+  }
+
+  createMenuModalContent = () => {
+    const modalCloseBtn = document.createElement('button');
+    modalCloseBtn.addEventListener('click', this.closeModal);
+    modalCloseBtn.classList.add('menu-modal__close');
+
+    const ul = document.createElement('ul');
+    ul.classList.add('menu-modal__links');
+    const links = ['Collections', 'Men', 'Women', 'About', 'Contact'];
+
+    links.forEach((link) => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.innerText = link;
+      a.href = `Link to ${link}`;
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+
+    this.menuModal.append(modalCloseBtn, ul);
+    document.body.appendChild(this.menuModal);
+  }
+
+  closeModal = () => {
+    const removeModal = document.querySelector('.menu-modal');
+    removeModal.remove();
+    document.body.classList.remove('fixed-position');
+    this.menuModal.close();
+  }
+}
+
+const menuButton = document.querySelector('.nav__menu');
+new Modal(menuButton);
