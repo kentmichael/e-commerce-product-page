@@ -116,7 +116,7 @@
     &--minus {
       height: rem(20);
       transition: opacity 300ms ease-in;
-      background-image: url('/images/icon-minus.svg');
+      background-image: url('../images/icon-minus.svg');
       background-size: rem(13) rem(5);
 
       &:hover{
@@ -127,7 +127,7 @@
     &--plus {
       height: rem(20);
       transition: opacity 300ms ease-in;
-      background-image: url('/images/icon-plus.svg');
+      background-image: url('../images/icon-plus.svg');
       background-size: rem(13) rem(13);
 
       &:hover{
@@ -141,6 +141,7 @@
       align-items: center;
       gap: rem(15);
       width: 100%;
+      box-shadow: 0 rem(25) rem(15) var(--pale-orange);
       border: none;
       border-radius: rem(10);
       padding-block: rem(19);

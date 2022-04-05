@@ -1,7 +1,18 @@
 'use-strict'
 
 /*
-  Product class
+  This is a single product page which is loaded after
+  the user selects an item in the Main Page (page that
+  displays all the product).
+  Created a user and product class to simulate an interaction
+  between a customer and the products.
+*/
+/*
+  This product class contains information about the inventory.
+  It also has several methods for showing the product
+  information such as section for product abouts, slider and gallery
+  to show product images. Lot of changes here if this is to be
+  connected in a full stack app.
 */
 class Product {
   constructor() {
@@ -33,10 +44,9 @@ class Product {
         ]
       }
     ];
-
   }
 
-  // Product Info
+  // Product Info Section
   displayProductInfo = (id) => {
     const productContainer = document.querySelector('.product');
     const productCompany = document.createElement('p');
@@ -96,8 +106,8 @@ class Product {
   }
 
   // Slider
-  displayProductInSlider = (id) => {
-    const sliderContainer = document.querySelector('.slider');
+  displayProductInSlider = (id, sliderHolder = 'slider') => {
+    const sliderContainer = document.querySelector(`.${sliderHolder}`);
     const posterContainer = document.createElement('div');
     const posterContainerImg = document.createElement('div');
     const sliderNextBtn = document.createElement('button');
@@ -109,44 +119,51 @@ class Product {
         for(let image of product.images){
           const imageHolder = document.createElement('img');
           imageHolder.src = image.poster;
-          imageHolder.classList.add('slider__poster--hide');
+          imageHolder.classList.add(`${sliderHolder}__poster--hide`);
           posterContainerImg.appendChild(imageHolder);
         }
       }
     });
 
-    posterContainer.classList.add('slider__poster');
-    posterContainerImg.classList.add('slider__poster--imgs');
-    sliderPrevBtn.classList.add('slider__poster--prev');
-    sliderNextBtn.classList.add('slider__poster--next');
-    sliderPrevBtn.addEventListener('click', this.prevImage);
-    sliderNextBtn.addEventListener('click', this.nextImage);
+    posterContainer.classList.add(`${sliderHolder}__poster`);
+    posterContainerImg.classList.add(`${sliderHolder}__poster--imgs`);
+    sliderPrevBtn.classList.add(`${sliderHolder}__poster--prev`);
+    sliderNextBtn.classList.add(`${sliderHolder}__poster--next`);
+    sliderPrevBtn.addEventListener('click', () => {
+      this.prevImage(sliderHolder);
+    });
+    sliderNextBtn.addEventListener('click', () => {
+      this.nextImage(sliderHolder);
+    });
     posterContainer.append(posterContainerImg, sliderPrevBtn, sliderNextBtn);
     sliderContainer.appendChild(posterContainer);
 
     this.slideIndex = 1;
-    this.showImages();
+    this.showImages(sliderHolder);
   }
 
-  showImages = () => {
-    const imagesContainer = document.querySelector('.slider__poster--imgs');
+  showImages = (sliderHolder = 'slider', idx=null) => {
+    this.slideIndex = idx===null ? this.slideIndex : idx+1;
+    const imagesContainer = document.querySelector(`.${sliderHolder}__poster--imgs`);
     imagesContainer.childNodes.forEach((node) => {
-      node.classList.remove('slider__poster--show');
+      node.classList.remove(`${sliderHolder}__poster--show`);
     });
     if(this.slideIndex < 1) this.slideIndex = imagesContainer.childNodes.length;
     if(this.slideIndex > imagesContainer.childNodes.length) this.slideIndex = 1;
-
-    imagesContainer.childNodes[this.slideIndex-1].classList.add('slider__poster--show');
+    
+    imagesContainer.childNodes[this.slideIndex-1].classList.add(`${sliderHolder}__poster--show`);
   }
 
-  prevImage = () => {
+  prevImage = (sliderHolder = 'slider') => {
     this.slideIndex--;
-    this.showImages();
+    this.showImages(sliderHolder);
+    if(document.querySelector('.modalSlider')) this.selectedThumbnail(this.slideIndex-1, 'modalSlider');
   }
 
-  nextImage = () => {
+  nextImage = (sliderHolder = 'slider') => {
     this.slideIndex++;
-    this.showImages();
+    this.showImages(sliderHolder);
+    if(document.querySelector('.modalSlider')) this.selectedThumbnail(this.slideIndex-1, 'modalSlider');
   }
 
   // Gallery
@@ -164,6 +181,7 @@ class Product {
           const galleryThumbnailDiv = document.createElement('div');
           galleryPosterImg.classList.add('gallery__poster--hide');
           galleryPosterImg.src = posters.poster;
+          galleryPosterImg.addEventListener('click', () => this.showModalSlider(id, idx));
           galleryPoster.appendChild(galleryPosterImg);
           galleryThumbnailImg.src = posters.thumbnail;
           galleryThumbnailImg.classList.add('gallery__thumbnail--img');
@@ -194,33 +212,78 @@ class Product {
     galleryPoster.childNodes[idx].classList.add('gallery__poster--show');
   }
 
-  selectedThumbnail = (idx=0) => {
-    const galleryThumbnail = document.querySelectorAll('.gallery__thumbnail--img');
-    const galleryThumbnailDiv = document.querySelector('.gallery__thumbnail');
-
+  selectedThumbnail = (idx=0, holder='gallery') => {
+    const galleryThumbnail = document.querySelectorAll(`.${holder}__thumbnail--img`);
+    const galleryThumbnailDiv = document.querySelector(`.${holder}__thumbnail`);
     galleryThumbnailDiv.childNodes.forEach((element) => {
-      element.classList.remove('gallery__thumbnail--border');
+      element.classList.remove(`${holder}__thumbnail--border`);
     });
 
     galleryThumbnail.forEach((element) => {
-      element.classList.remove('gallery__thumbnail--selected');
+      element.classList.remove(`${holder}__thumbnail--selected`);
     });
 
-    galleryThumbnail[idx].classList.add('gallery__thumbnail--selected');
-    galleryThumbnailDiv.childNodes[idx].classList.add('gallery__thumbnail--border');
+    galleryThumbnail[idx].classList.add(`${holder}__thumbnail--selected`);
+    galleryThumbnailDiv.childNodes[idx].classList.add(`${holder}__thumbnail--border`);
   }
 
+  // Modal Slider
+  showModalSlider = (id, idx) => {
+    const {products} = this;
+    const modalSlider = document.createElement('dialog');
+    const closeModal = document.createElement('button');
+    const modalThumbnail = document.createElement('div');
+
+    closeModal.classList.add('modalSlider__close');
+    closeModal.addEventListener('click', this.closeModalSlider);
+    modalSlider.appendChild(closeModal);
+    modalSlider.classList.add('modalSlider');
+    document.body.appendChild(modalSlider);
+
+    this.displayProductInSlider(id, 'modalSlider');
+
+    products.forEach((product) => {
+      if(product.id === id){
+        product.images.forEach((posters, idx) => {
+          const modalThumbnailImg = document.createElement('img');
+          const modalThumbnailDiv = document.createElement('div');
+          modalThumbnailImg.src = posters.thumbnail;
+          modalThumbnailImg.classList.add('modalSlider__thumbnail--img');
+          modalThumbnailDiv.addEventListener('click', () => {
+            this.showImages('modalSlider', idx);
+            this.selectedThumbnail(idx, 'modalSlider');
+          });
+          modalThumbnailDiv.appendChild(modalThumbnailImg)
+          modalThumbnail.appendChild(modalThumbnailDiv);
+        })
+      }
+    });
+    modalThumbnail.classList.add('modalSlider__thumbnail');
+    modalSlider.appendChild(modalThumbnail);
+    modalSlider.showModal();
+    this.selectedThumbnail(idx, 'modalSlider');
+  }
+
+  closeModalSlider = () => {
+    const modalSlider = document.querySelector('.modalSlider');
+    modalSlider.remove();
+    modalSlider.close();
+  }
 }
 
 const productId = 1;
 const inventoryProduct = new Product();
-// Selected product id from main page
+// Selected product id from Main Page
 inventoryProduct.displayProductInfo(productId);
 inventoryProduct.displayProductInSlider(productId);
 inventoryProduct.displayProductInGallery(productId);
 
 /*
-  User class
+  This user class contains information about the current user.
+  It has the customer name, cart info and several methods like,
+  add to cart, update cart, delete cart. Also it has, view access
+  to the product class. Same with the product class, there's a lot
+  to add/change here if to be connected in a full stack app.
 */
 class User {
   constructor(inventoryProduct, productId, addToMyCart, showMyCart, cartDialog, setQuantityPlus, setQuantityMinus) {
@@ -270,6 +333,7 @@ class User {
             });
           }
         });
+        this.setQuantityIndicator();
       }
       this.setQuantity(true);
       this.quantityCount = 0;
@@ -282,11 +346,11 @@ class User {
 
   updateCartProduct = () => {
     const {user, prodId, quantityCount} = this;
-    const updatedCart = user.cart.map((item) => {
-      if(item.id===prodId) item.quantity = item.quantity + quantityCount;
+    user.cart.forEach((item, idx) => {
+      if(item.id===prodId) this.user.cart[idx].quantity = item.quantity + quantityCount;
       return item;
     });
-    this.user.cart = updatedCart.slice();
+    this.setQuantityIndicator();
   }
 
   addProductQuantity = () => {
@@ -322,7 +386,6 @@ class User {
       cartDialogHeader.classList.add('nav__dialog--header');
       cartDialogHeader.innerText = 'Cart';
       
-
       if(user.cart.length===0){
         cartDialogContent.classList.add('nav__dialog--empty');
         cartDialogContent.innerText = 'Your cart is empty.';
@@ -373,6 +436,7 @@ class User {
       if(item.id === id) index = idx;
     });
     this.user.cart.splice(index, 1);
+    this.setQuantityIndicator();
   } 
 
   updateCartModal = () => {
@@ -414,6 +478,18 @@ class User {
     });
   }
 
+  setQuantityIndicator = () => {
+    const {user} = this;
+    const cartIndicator = document.querySelector('.nav__cart--indicator');
+    let total = 0;
+    user.cart.forEach((item) => {
+      total = total + item.quantity;
+    });
+    cartIndicator.innerText = total;
+    if(total===0) cartIndicator.classList.add('nav__cart--hide');
+    else cartIndicator.classList.remove('nav__cart--hide');
+  }
+
   closeCartModal = () => {
     const cartModal = document.querySelector('.nav__dialog');
     cartModal.remove();
@@ -429,8 +505,9 @@ const cartDialog = document.querySelector('.nav__dialog');
 
 const customer = new User(inventoryProduct, productId, addToMyCart, showMyCart, cartDialog, setQuantityPlus, setQuantityMinus);
 
-// Modals
-
+/*
+  Control the Menu Modal
+*/
 class Modal {
   constructor(menuButton) {
     this.menuButtonModal = menuButton;

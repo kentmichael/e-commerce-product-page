@@ -49,14 +49,14 @@
       width: rem(42);
       height: rem(42);
       left: rem(16);
-      background-image: url('/images/icon-previous.svg');
+      background-image: url('../images/icon-previous.svg');
     }
   
     &--next {
       width: rem(42);
       height: rem(42);
       right: rem(16);
-      background-image: url('/images/icon-next.svg');
+      background-image: url('../images/icon-next.svg');
     }
   }
 }
