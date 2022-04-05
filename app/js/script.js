@@ -96,9 +96,6 @@ class Product {
     productAddDivSpan.classList.add('product__add--quantity');
     productAddDivBtn2.classList.add('product__add--plus');
     productAddButton.classList.add('product__add--tocart');
-
-    productAddDivBtn1.setAttribute('alt', "Subtract Quantity");
-    productAddDivBtn2.setAttribute('alt', "Add Quantity");
     
     productPriceSpan1.appendChild(productPriceSpan2);
     productPriceDiv.append(productPriceSpan1, productPriceSpan3);
