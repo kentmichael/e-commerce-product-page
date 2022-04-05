@@ -79,6 +79,7 @@ class Product {
         }
         productAddDivSpan.innerText = 0;
         productAddBtnIcon.src = 'images/icon-cart-white.svg';
+        productAddBtnIcon.setAttribute('alt', "Add to Cart Icon");
         productAddButton.innerText = 'Add to cart';
       }
     })
@@ -95,6 +96,9 @@ class Product {
     productAddDivSpan.classList.add('product__add--quantity');
     productAddDivBtn2.classList.add('product__add--plus');
     productAddButton.classList.add('product__add--tocart');
+
+    productAddDivBtn1.setAttribute('alt', "Subtract Quantity");
+    productAddDivBtn2.setAttribute('alt', "Add Quantity");
     
     productPriceSpan1.appendChild(productPriceSpan2);
     productPriceDiv.append(productPriceSpan1, productPriceSpan3);
@@ -119,6 +123,7 @@ class Product {
         for(let image of product.images){
           const imageHolder = document.createElement('img');
           imageHolder.src = image.poster;
+          imageHolder.setAttribute('alt', 'Slider Image');
           imageHolder.classList.add(`${sliderHolder}__poster--hide`);
           posterContainerImg.appendChild(imageHolder);
         }
@@ -181,9 +186,11 @@ class Product {
           const galleryThumbnailDiv = document.createElement('div');
           galleryPosterImg.classList.add('gallery__poster--hide');
           galleryPosterImg.src = posters.poster;
+          galleryPosterImg.setAttribute('alt', "Gallery Poster");
           galleryPosterImg.addEventListener('click', () => this.showModalSlider(id, idx));
           galleryPoster.appendChild(galleryPosterImg);
           galleryThumbnailImg.src = posters.thumbnail;
+          galleryThumbnailImg.setAttribute('alt', "Gallery Thumbnail");
           galleryThumbnailImg.classList.add('gallery__thumbnail--img');
           galleryThumbnailDiv.addEventListener('click', () => {
             this.showPoster(idx);
@@ -248,6 +255,7 @@ class Product {
           const modalThumbnailImg = document.createElement('img');
           const modalThumbnailDiv = document.createElement('div');
           modalThumbnailImg.src = posters.thumbnail;
+          modalThumbnailImg.setAttribute('alt', 'Modal Thumbnail');
           modalThumbnailImg.classList.add('modalSlider__thumbnail--img');
           modalThumbnailDiv.addEventListener('click', () => {
             this.showImages('modalSlider', idx);
@@ -406,6 +414,7 @@ class User {
           });
 
           cartDialogContentIcon.src = item.image;
+          cartDialogContentIcon.setAttribute('alt', 'Product Icon');
           cartDialogContentDiv2Name.innerText = item.name;
           let total = (item.price - (item.price * (item.discount/100))) * item.quantity;
           cartDialogContentDiv2Total.innerHTML = `$${(item.price * (item.discount/100)).toFixed(2)} x ${item.quantity} <span class="total">$${total.toFixed(2)}</span>`;
@@ -469,6 +478,7 @@ class User {
       });
 
       cartDialogContentIcon.src = item.image;
+      cartDialogContentIcon.setAttribute('alt', 'Product Icon');
       cartDialogContentDiv2Name.innerText = item.name;
       let total = (item.price - (item.price * (item.discount/100))) * item.quantity;
       cartDialogContentDiv2Total.innerHTML = `$${(item.price * (item.discount/100)).toFixed(2)} x ${item.quantity} <span class="total">$${total.toFixed(2)}</span>`;
